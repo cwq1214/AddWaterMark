@@ -33,9 +33,11 @@ public class WaterMarkUtil {
     }
 
     public void create(String sourcePath, String savePath, WaterMark waterMark)throws Exception {
-        int suffixBeginIndex = sourcePath.lastIndexOf("/");
-        String fileName = sourcePath.substring(suffixBeginIndex + 1, sourcePath.length());
-        fileName = fileName.toLowerCase();
+//        int suffixBeginIndex = sourcePath.lastIndexOf("/");
+//        String fileName = sourcePath.substring(suffixBeginIndex + 1, sourcePath.length());
+//        fileName = fileName.toLowerCase();
+
+        String fileName = new File(sourcePath).getName();
 
         int FONT_SIZE = waterMark.getFontSize();
         String MARK_TEXT = waterMark.getContent();
@@ -134,7 +136,10 @@ public class WaterMarkUtil {
 
             File file ;
             File savePathFile= new File(savePath);
-            if (savePathFile.isFile()){
+            if (savePath.contains(".")){
+                if (savePathFile.getParentFile()!=null){
+                    savePathFile.getParentFile().mkdirs();
+                }
                 file = savePathFile;
             }else {
                 file = new File(savePath+"/"+fileName);
