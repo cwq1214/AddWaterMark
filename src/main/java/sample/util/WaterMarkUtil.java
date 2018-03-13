@@ -156,6 +156,8 @@ public class WaterMarkUtil {
 //            JPEGImageEncoder en = JPEGCodec.createJPEGEncoder(os);
 //            //使用图像编码工具类，输出缓存图像到目标文件
 //            en.encode(bufferedImage);
+        }else {
+            throw new Exception("位置类型");
         }
 
     }
@@ -172,8 +174,8 @@ public class WaterMarkUtil {
             }
         }
 //        length = length % 2 == 0 ? length / 2 : length / 2 + 1;
-
-        if ((length/2+"").contains(".")){
+        length=length/2;
+        if ((length+"").contains(".")){
             length = length+1;
         }
         return length;
