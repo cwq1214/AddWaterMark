@@ -20,7 +20,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="AddWaterMark" target="1.5" />
+      <module name="AddWaterMark" target="1.9" />
     </bytecodeTargetLevel>
   </component>
 </project>

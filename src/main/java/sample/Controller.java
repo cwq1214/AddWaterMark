@@ -8,7 +8,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.bean.MarkType;
@@ -101,13 +104,25 @@ public class Controller {
         inputSourcePath.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 sourcePath = inputSourcePath.getText();
+
+                int lastDot = sourcePath.lastIndexOf(".");
+                String savePath = sourcePath.substring(0,lastDot)+"___"+sourcePath.substring(lastDot,sourcePath.length());
+                inputSavePath.setText(savePath);
             }
         });
+
+        inputSourcePath.setOnDragOver(new DragOverEvent(inputSourcePath));
+
+        inputSourcePath.setOnDragDropped(new DragDroppedEvent(inputSourcePath));
+
         inputSavePath.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 savePath = inputSavePath.getText();
             }
         });
+
+
+
 
         inputHorizontalSpace.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -136,8 +151,8 @@ public class Controller {
                 );
                 File file = fileChooser.showOpenDialog(new Stage());
                 if (file!=null){
-                    if (!file.getName().toLowerCase().matches(".*.(jpg|png|jpeg)")){
-                        new Alert(Alert.AlertType.INFORMATION,"目前只支持JPG,PNG,JPEG").show();
+                    if (!file.getName().toLowerCase().matches(".*.(jpg|png|jpeg|pdf)")){
+                        new Alert(Alert.AlertType.INFORMATION,"目前只支持JPG,PNG,JPEG,PDF").show();
                         return;
                     }
 
@@ -145,6 +160,8 @@ public class Controller {
                 }
             }
         });
+
+
         btnSelSavePath.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
@@ -217,6 +234,46 @@ public class Controller {
 
             }
         });
+    }
+
+    public class DragOverEvent implements EventHandler<DragEvent> {
+
+        private TextField textField;
+
+        public DragOverEvent(TextField textField){
+            this.textField = textField;
+        }
+
+        public void handle(DragEvent event) {
+
+            if (event.getGestureSource() != textField){
+                event.acceptTransferModes(TransferMode.ANY);
+            }
+        }
+    }
+
+    public class DragDroppedEvent implements EventHandler<DragEvent> {
+
+
+        private TextField textField;
+
+        public DragDroppedEvent(TextField textField){
+            this.textField = textField;
+        }
+
+        public void handle(DragEvent event) {
+            Dragboard dragboard = event.getDragboard();
+            if (dragboard.hasFiles()){
+                try {
+                    File file = dragboard.getFiles().get(0);
+                    if (file != null) {
+                        textField.setText(file.getAbsolutePath());
+                    }
+                }catch (Exception e){
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
     }
 
 }
