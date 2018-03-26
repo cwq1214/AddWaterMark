@@ -12,6 +12,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.bean.MarkType;
@@ -45,7 +46,8 @@ public class Controller {
     TextField inputHorizontalSpace;
     @FXML
     TextField inputVerticalSpace;
-
+    @FXML
+    GridPane content;
 
     String markContent ;
     String fontSize ;
@@ -111,9 +113,31 @@ public class Controller {
             }
         });
 
-        inputSourcePath.setOnDragOver(new DragOverEvent(inputSourcePath));
+        content.setOnDragOver(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+//                if (event.getGestureSource() != inputSourcePath){
+                    event.acceptTransferModes(TransferMode.ANY);
+//                }
+            }
+        });
 
-        inputSourcePath.setOnDragDropped(new DragDroppedEvent(inputSourcePath));
+        content.setOnDragDropped(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard dragboard = event.getDragboard();
+                if (dragboard.hasFiles()){
+                    try {
+                        File file = dragboard.getFiles().get(0);
+                        if (file != null) {
+                            inputSourcePath.setText(file.getAbsolutePath());
+                        }
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        });
 
         inputSavePath.textProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -238,17 +262,13 @@ public class Controller {
 
     public class DragOverEvent implements EventHandler<DragEvent> {
 
-        private TextField textField;
 
-        public DragOverEvent(TextField textField){
-            this.textField = textField;
+        public DragOverEvent(){
         }
 
         public void handle(DragEvent event) {
 
-            if (event.getGestureSource() != textField){
-                event.acceptTransferModes(TransferMode.ANY);
-            }
+
         }
     }
 
@@ -262,17 +282,7 @@ public class Controller {
         }
 
         public void handle(DragEvent event) {
-            Dragboard dragboard = event.getDragboard();
-            if (dragboard.hasFiles()){
-                try {
-                    File file = dragboard.getFiles().get(0);
-                    if (file != null) {
-                        textField.setText(file.getAbsolutePath());
-                    }
-                }catch (Exception e){
-                    System.out.println(e.getMessage());
-                }
-            }
+
         }
     }
 

@@ -1,9 +1,8 @@
 package sample.util;
 
+
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-
-import org.apache.poi.ss.util.WorkbookUtil;
 import sample.bean.WaterMark;
 
 import javax.imageio.ImageIO;
@@ -21,8 +20,8 @@ import java.io.OutputStream;
 public class WaterMarkUtil {
 
     public String FONT_NAME = "宋体";
-    public int FONT_STYLE = Font.BOLD;
-    public float ALPHA = 0.5f;
+    public int FONT_STYLE = Font.TRUETYPE_FONT;
+    public float ALPHA = 0.3f;
 
     private static WaterMarkUtil waterMarkUtil = new WaterMarkUtil();
 
@@ -53,7 +52,6 @@ public class WaterMarkUtil {
                 }
                 savePath =savePath+name;
             }
-         Document document = new Document();
 
             PdfReader reader = new PdfReader(sourcePath);
             PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(new File(savePath)));
@@ -62,15 +60,13 @@ public class WaterMarkUtil {
             int pages = reader.getNumberOfPages();
 
 
-            System.out.println("pages:"+pages);
-
             int length = getTextLength(MARK_TEXT);
 
 
             int A4Height = 842;
             int A4Width = 595;
             //根据文字生成临时图片
-            BufferedImage bufferedImage = new BufferedImage(A4Height,A4Height,BufferedImage.TYPE_INT_RGB);
+            BufferedImage bufferedImage = new BufferedImage(A4Height,A4Height,BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D graphics2d = bufferedImage.createGraphics();
             bufferedImage = graphics2d.getDeviceConfiguration().createCompatibleImage(A4Width, A4Height, Transparency.TRANSLUCENT);
@@ -91,6 +87,7 @@ public class WaterMarkUtil {
 
             File saveFile =new File("tempImage.png");
             saveFile.createNewFile();
+            saveFile.deleteOnExit();
             ImageIO.write(bufferedImage,"PNG",saveFile);
 
             PdfContentByte over;
@@ -107,7 +104,6 @@ public class WaterMarkUtil {
             }
             stamper.close();
             reader.close();
-            saveFile.deleteOnExit();
 
         } else if (fileName.matches(".*.(jpg|png|gif|jpeg)")) {
 
@@ -165,13 +161,12 @@ public class WaterMarkUtil {
         int waterWidth = fontSize*getTextLength(text);
         int waterHeight = fontSize;
 
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
         int x = -maxSize;
         int y = -maxSize;
         while(x < maxSize){
             while(y < maxSize){
-                System.out.println("drawString ");
-                System.out.println("x "+x);
-                System.out.println("y "+y);
                 graphics2D.drawString(text, x, y);
                 y+=waterHeight+vSpace;
             }
